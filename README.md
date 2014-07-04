@@ -25,7 +25,9 @@ Example
 Demo:
 ------
    Link1: http://dsubhajit.net76.net/flot/examples/basic-usage/index.html
+
    Link2: http://dsubhajit.net76.net/flot/examples/categories/index.html
+
    Link3: http://dsubhajit.net76.net/flot/examples/series-types/index.html
 
 Compatibility
