@@ -76,7 +76,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
     }
 
     function getText2Canvas(textholder,placeholder) {
-    	$(placeholder).append('<canvas style="display:none;" class="sb-canvas-elemnt" '
+    	$(placeholder).append('<canvas style="display:none; " class="sb-canvas-elemnt" '
 		+'width="'+($(placeholder).width() || $(placeholder).find('canvas').width())
 		+'" height="'+($(placeholder).height() || $(placeholder).find('canvas').height() )+'" ></canvas>');
 
@@ -105,9 +105,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
     			
     		});
     	}
-
-
-    	console.log();	
+    	
     	return ctx;
     }
 
@@ -121,57 +119,44 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
     	return file;
     }
 
-    function download(blobData,filename) {
-    	var a = document.createElement('a');	     	
-		a.href = blobData;
-	
-		a.href = window.URL.createObjectURL(blobData);
-		if ($.browser.webkit) {
-			a.download = filename;
-			a.click();
-		}
-		else {
-			window.open(a.href, "_blank", "");
-		}
+    function download(baseData,filename) {
+    	var a = document.createElement('a');
+	a.href = window.URL.createObjectURL(dataFile(baseData));
+	if ($.browser.webkit) {
+		a.download = filename;
+		a.click();
+	}
+	else {
+		window.open(baseData, "_blank", "");
+	}
     }
 
 
     function initClickEvent(placeholder,plot){
-	$(placeholder).find('.flotbtn').click(function(){
-	    $(placeholder).append('<div class="flot-tmp-div" style="display:none;width:'
-	    		+$(placeholder).width()+';height:'+$(placeholder).height()+'"></div>');
+	$(placeholder).find('.flotbtn').click(function(){		
 	    var myCanvas = plot.getCanvas();
-	    var image = myCanvas.toDataURL();
-		
-	    $(placeholder).find('.flot-tmp-div').append('<canvas class="flot-tmp-canvas" width="'
-	    		+($(placeholder).width()+12)+'" height="'+($(placeholder).height()+12)+'" ></canvas>');
-
-	    var ctx = $(placeholder).find('.flot-tmp-div').find('canvas')[0].getContext("2d");
-
-	    var img = new Image($(placeholder).find('.flot-tmp-div'));
-
+	    var image = myCanvas.toDataURL();		
+	    var img = new Image();		
+	    img.src = image;
 	    var textCanvas = getText2Canvas('flot-text',placeholder);
 		
-	    img.src = image.toString();
-	    ctx.drawImage(img,0,0);		
+	    img.onload = function (){
+		console.log(img);
 		
-	    image = textCanvas.canvas.toDataURL();
-		
-		
-	    img.src = image.toString();
-	    ctx.drawImage(img,0,0);
-		
-	    image = $(placeholder).find('.flot-tmp-div').find('canvas')[0].toDataURL();
-		
-	    $(placeholder).find('.flot-tmp-div').each(function(){
-		$(this).remove();
-	    });
-		
-	    $('.sb-canvas-elemnt').remove();
-	    
-	   download(dataFile(image),'chart.png');		
-		
-		
+		textCanvas.drawImage(img,0,0);
+		image = textCanvas.canvas.toDataURL();		
+
+		textCanvas.canvas.remove();
+
+		download(image,'chart.png');
+		$(placeholder).find('.flot-tmp-div').each(function(){
+			$(this).remove();
+		});
+	
+	    }
+	    img.onerror = function () {
+	        console.error("Cannot load image");		   
+	    }	
 	});
     }
 
