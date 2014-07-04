@@ -121,12 +121,6 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
     	return file;
     }
 
-    /*
-	The function download src is taken from 
-	http://stackoverflow.com/questions/15946084/save-javascript-output-as-textfile
-	User Handle : TheBrain
-    */
-
     function download(blobData,filename) {
     	var a = document.createElement('a');	     	
 		a.href = blobData;
