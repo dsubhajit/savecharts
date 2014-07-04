@@ -101,8 +101,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
     			top = parseInt($(this).css('top'))+12;
 
     			left = parseInt($(this).css('left'));
-    			ctx.fillText($($(this)).text(),left,top);
-    			console.log(top+' '+left+' '+$(this).text() );    			
+    			ctx.fillText($($(this)).text(),left,top);    			
     			
     		});
     	}
@@ -129,10 +128,17 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
     */
 
     function download(blobData,filename) {
-    	var a = document.createElement('a');	     
-	a.href = window.URL.createObjectURL(blobData);
-	a.download = filename;
-	a.click();
+    	var a = document.createElement('a');	     	
+		a.href = blobData;
+	
+		a.href = window.URL.createObjectURL(blobData);
+		if ($.browser.webkit) {
+			a.download = filename;
+			a.click();
+		}
+		else {
+			window.open(a.href, "_blank", "");
+		}
     }
 
 
@@ -142,7 +148,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	    		+$(placeholder).width()+';height:'+$(placeholder).height()+'"></div>');
 	    var myCanvas = plot.getCanvas();
 	    var image = myCanvas.toDataURL();
-            
+		
 	    $(placeholder).find('.flot-tmp-div').append('<canvas class="flot-tmp-canvas" width="'
 	    		+($(placeholder).width()+12)+'" height="'+($(placeholder).height()+12)+'" ></canvas>');
 
@@ -161,20 +167,23 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	    img.src = image.toString();
 	    ctx.drawImage(img,0,0);
 		
-	    image = $(placeholder).find('.flot-tmp-div').find('canvas')[0].toDataURL("image/png");
+	    image = $(placeholder).find('.flot-tmp-div').find('canvas')[0].toDataURL();
+		
 	    $(placeholder).find('.flot-tmp-div').each(function(){
 		$(this).remove();
 	    });
 		
 	    $('.sb-canvas-elemnt').remove();
 	    
-	    download(dataFile(image),'chart.png');		
+	   download(dataFile(image),'chart.png');		
+		
 		
 	});
     }
 
     function insertSaveButton(placeholder){
-	$(placeholder).append('<div class="savechart" ><table><tr><td><span class="flotbtn flotsave" title="Save Chart" > Save</span></td></tr></table></div>');
+	$(placeholder).append('<div class="savechart" ><table><tr><td><span class="flotbtn flotsave" '
+				+'title="Save Chart" > Save</span></td></tr></table></div>');
 	$(placeholder).children('.savechart').children('table').css('position','absolute');
 	$(placeholder).children('.savechart').children('table').css('top',10);
 	$(placeholder).children('.savechart').children('table').css('right',50);
