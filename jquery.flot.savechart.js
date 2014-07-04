@@ -140,8 +140,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	    img.src = image;
 	    var textCanvas = getText2Canvas('flot-text',placeholder);
 		
-	    img.onload = function (){
-		console.log(img);
+	    img.onload = function (){		
 		
 		textCanvas.drawImage(img,0,0);
 		image = textCanvas.canvas.toDataURL();		
