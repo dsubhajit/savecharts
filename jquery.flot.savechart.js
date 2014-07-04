@@ -34,10 +34,10 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 (function ($) {
     var options = { 
-		saveChart:{
-			show:false,								
-		}	
-	};
+    	saveChart:{
+		show:false,								
+	}	
+    };
 
 	var btnStyle = '.flotbtn {'
 		  		+'display: inline-block;'
