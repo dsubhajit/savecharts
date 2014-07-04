@@ -35,32 +35,33 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 (function ($) {
     var options = { 
     	saveChart:{
-		show:false,								
+	    show:false,								
 	}	
     };
 
-	var btnStyle = '.flotbtn {'
-		  		+'display: inline-block;'
-				+'background: rgb(102,133,164);'
-				+'border: 1px solid #a1a1a1;'
-				+'padding: 0 5px;'
-				+'margin: 3px -15px 3px;'
-				+'font: Arial, Helvetica;'
-				+'text-decoration: none;'
-				+'color: #fff;'
-				+'border-radius: .2em;'
-				+'cursor:pointer;'
-				+'}'
-				+'.flotbtn:before{'
-				+'width: 1em;'
-				+'text-align: center;'
-				+'font-size: 1.7em;'
-				+'margin: 0 0.5em 0 -1em;'
-				+'padding: 0 .2em;'
-				+'pointer-events: none;'
-				+'}';
+    var btnStyle = '.flotbtn {'
+		+'display: inline-block;'
+		+'background: rgb(102,133,164);'
+		+'border: 1px solid #a1a1a1;'
+		+'padding: 0 5px;'
+		+'margin: 3px -15px 3px;'
+		+'font: Arial, Helvetica;'
+		+'text-decoration: none;'
+		+'color: #fff;'
+		+'border-radius: .2em;'
+		+'cursor:pointer;'
+		+'}'
+		+'.flotbtn:before{'
+		+'width: 1em;'
+		+'text-align: center;'
+		+'font-size: 1.7em;'
+		+'margin: 0 0.5em 0 -1em;'
+		+'padding: 0 .2em;'
+		+'pointer-events: none;'
+		+'}';
 
-	$('head').append('<style>'+btnStyle+'</style>');
+    $('head').append('<style>'+btnStyle+'</style>');
+
     function canvasSupported() {
         return !!document.createElement('canvas').getContext;
     }
@@ -75,7 +76,10 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
     }
 
     function getText2Canvas(textholder,placeholder) {
-    	$(placeholder).append('<canvas style="display:none;" class="sb-canvas-elemnt" width="'+($(placeholder).width() || $(placeholder).find('canvas').width())+'" height="'+($(placeholder).height() || $(placeholder).find('canvas').height() )+'" ></canvas>');
+    	$(placeholder).append('<canvas style="display:none;" class="sb-canvas-elemnt" '
+		+'width="'+($(placeholder).width() || $(placeholder).find('canvas').width())
+		+'" height="'+($(placeholder).height() || $(placeholder).find('canvas').height() )+'" ></canvas>');
+
     	var ctx = $('.sb-canvas-elemnt')[0].getContext("2d");
     	ctx.font="12px arial";
 		
@@ -119,74 +123,76 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
     }
 
     /*
-		The function download src is taken from 
-		http://stackoverflow.com/questions/15946084/save-javascript-output-as-textfile
-		User Handle : TheBrain
+	The function download src is taken from 
+	http://stackoverflow.com/questions/15946084/save-javascript-output-as-textfile
+	User Handle : TheBrain
     */
 
     function download(blobData,filename) {
-	     var a = document.createElement('a');	     
-	     a.href = window.URL.createObjectURL(blobData);
-	     a.download = filename;
-	     a.click();
-	};
+    	var a = document.createElement('a');	     
+	a.href = window.URL.createObjectURL(blobData);
+	a.download = filename;
+	a.click();
+    }
 
 
-	function initClickEvent(placeholder,plot){
-		$(placeholder).find('.flotbtn').click(function(){
-			$(placeholder).append('<div class="flot-tmp-div" style="display:none;width:'+$(placeholder).width()+';height:'+$(placeholder).height()+'"></div>');
-			var myCanvas = plot.getCanvas();
-			var image = myCanvas.toDataURL();
+    function initClickEvent(placeholder,plot){
+	$(placeholder).find('.flotbtn').click(function(){
+	    $(placeholder).append('<div class="flot-tmp-div" style="display:none;width:'
+	    		+$(placeholder).width()+';height:'+$(placeholder).height()+'"></div>');
+	    var myCanvas = plot.getCanvas();
+	    var image = myCanvas.toDataURL();
+            
+	    $(placeholder).find('.flot-tmp-div').append('<canvas class="flot-tmp-canvas" width="'
+	    		+($(placeholder).width()+12)+'" height="'+($(placeholder).height()+12)+'" ></canvas>');
 
-			$(placeholder).find('.flot-tmp-div').append('<canvas class="flot-tmp-canvas" width="'+($(placeholder).width()+12)+'" height="'+($(placeholder).height()+12)+'" ></canvas>');
+	    var ctx = $(placeholder).find('.flot-tmp-div').find('canvas')[0].getContext("2d");
 
-			var ctx = $(placeholder).find('.flot-tmp-div').find('canvas')[0].getContext("2d");
+	    var img = new Image($(placeholder).find('.flot-tmp-div'));
 
-			var img = new Image($(placeholder).find('.flot-tmp-div'));
+	    var textCanvas = getText2Canvas('flot-text',placeholder);
+		
+	    img.src = image.toString();
+	    ctx.drawImage(img,0,0);		
+		
+	    image = textCanvas.canvas.toDataURL();
+		
+		
+	    img.src = image.toString();
+	    ctx.drawImage(img,0,0);
+		
+	    image = $(placeholder).find('.flot-tmp-div').find('canvas')[0].toDataURL("image/png");
+	    $(placeholder).find('.flot-tmp-div').each(function(){
+		$(this).remove();
+	    });
+		
+	    $('.sb-canvas-elemnt').remove();
+	    
+	    download(dataFile(image),'chart.png');		
+		
+	});
+    }
 
-			var textCanvas = getText2Canvas('flot-text',placeholder);
-			
-			img.src = image.toString();
-			ctx.drawImage(img,0,0);		
-			
-			image = textCanvas.canvas.toDataURL();
-			
-			
-			img.src = image.toString();
-			ctx.drawImage(img,0,0);
-			
-			image = $(placeholder).find('.flot-tmp-div').find('canvas')[0].toDataURL("image/png");
-			$(placeholder).find('.flot-tmp-div').each(function(){
-				$(this).remove();
-			});
-			$('.sb-canvas-elemnt').remove();
-			download(dataFile(image),'chart.png');
-			
-			
-		});
-	}
+    function insertSaveButton(placeholder){
+	$(placeholder).append('<div class="savechart" ><table><tr><td><span class="flotbtn flotsave" title="Save Chart" > Save</span></td></tr></table></div>');
+	$(placeholder).children('.savechart').children('table').css('position','absolute');
+	$(placeholder).children('.savechart').children('table').css('top',10);
+	$(placeholder).children('.savechart').children('table').css('right',50);
+    }
 
-	function insertSaveButton(placeholder){
-		$(placeholder).append('<div class="savechart" ><table><tr><td><span class="flotbtn flotsave" title="Save Chart" > Save</span></td></tr></table></div>');
-		$(placeholder).children('.savechart').children('table').css('position','absolute');
-		$(placeholder).children('.savechart').children('table').css('top',10);
-		$(placeholder).children('.savechart').children('table').css('right',50);
-	}
+    function init(plot){
+	plot.hooks.draw.push( function (plot, ctx) {
+	    var origOptions = plot.options // Flot 0.7
+	                      || plot.getOptions() // Flot 0.6
+		              || plot.getOptions(); // Flot 1.1 
+	    if(!origOptions.saveChart.show) return;
 
-	function init(plot){		
+	    insertSaveButton(plot.getPlaceholder());	
+	    initClickEvent(plot.getPlaceholder(),plot);
+		
+	});
 
-		plot.hooks.draw.push( function (plot, ctx) {
-			var origOptions = plot.options // Flot 0.7
-                        || plot.getOptions() // Flot 0.6
-                        || plot.getOptions(); // Flot 1.1 
-			if(!origOptions.saveChart.show) return;
-
-			insertSaveButton(plot.getPlaceholder());	
-			initClickEvent(plot.getPlaceholder(),plot);
-			
-		});
-
-	}
+    }
 
 		
     $.plot.plugins.push({
